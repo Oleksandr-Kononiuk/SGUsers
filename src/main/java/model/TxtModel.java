@@ -1,5 +1,7 @@
 package model;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import view.ConsoleHelper;
 import java.io.*;
 import java.nio.file.Files;
@@ -8,6 +10,8 @@ import java.nio.file.StandardCopyOption;
 import java.util.*;
 
 public class TxtModel implements Externalizable, Model {
+    private static final Logger logger = LoggerFactory.getLogger(TxtModel.class);
+
     private List<Player> players = new ArrayList<>();
     private ConsoleHelper view = new ConsoleHelper();
 
@@ -36,19 +40,15 @@ public class TxtModel implements Externalizable, Model {
      */
 
     public void addNewPlayer(String SGProfileLink) {
-        try {
-            String SGID = SGProfileLink.substring(SGProfileLink.length() - 17);
-            Player newPlayer = SG.getNewPlayer(SGID);
+        String SGID = SGProfileLink.substring(SGProfileLink.length() - 17);
+        Player newPlayer = SG.getNewPlayer(SGID);
 
-            if (newPlayer == null) {
-                view.printMessage("Player '%s' not founded.", SGProfileLink);
-            } else {
-                players.add(newPlayer);
-                view.printMessage("New player '%s' was added.", newPlayer.getTempNickName());
-                writeToDB();
-            }
-        } catch (StringIndexOutOfBoundsException ex) {
-            System.out.println(ex.getMessage());
+        if (newPlayer == null) {
+            view.printMessage("Player '%s' not founded.", SGProfileLink);
+        } else {
+            players.add(newPlayer);
+            view.printMessage("New player '%s' was added.", newPlayer.getTempNickName());
+            writeToDB();
         }
     }
 
@@ -318,7 +318,7 @@ public class TxtModel implements Externalizable, Model {
 
             view.printMessage("Database is updated from backup.");
         } catch (IOException | ClassNotFoundException e) {
-            e.printStackTrace();
+            logger.error(Arrays.toString(e.getStackTrace()));
         }
     }
 
@@ -327,7 +327,8 @@ public class TxtModel implements Externalizable, Model {
         try {
             Files.copy(Paths.get(CURRENT_DB_PATH), Paths.get(CURRENT_BACKUP_PATH), StandardCopyOption.REPLACE_EXISTING);
         } catch (IOException e) {
-            e.printStackTrace();
+            view.printMessage("Database not updated.");
+            logger.error(Arrays.toString(e.getStackTrace()));
         }
 
         try (ObjectOutputStream objectOutputStream =
@@ -337,7 +338,8 @@ public class TxtModel implements Externalizable, Model {
             objectOutputStream.flush();
             view.printMessage("Database are updated.");
         } catch (IOException e) {
-            e.printStackTrace();
+            view.printMessage("Database not updated.");
+            logger.error(Arrays.toString(e.getStackTrace()));
         }
     }
 
@@ -351,7 +353,7 @@ public class TxtModel implements Externalizable, Model {
         } catch (IOException | ClassNotFoundException e) {
             view.printMessage("Data base was not found. " +
                     "Please use command !fill-players and !rebuild-families to create new Data base.");
-            e.printStackTrace();
+            logger.error(Arrays.toString(e.getStackTrace()));
         }
     }
 

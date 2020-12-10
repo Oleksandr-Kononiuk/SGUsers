@@ -3,14 +3,19 @@ package model;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class SGUtils {
+
+    private static final Logger logger = LoggerFactory.getLogger(SGUtils.class);
 
     //get info about new player, create player and return
     public Player getNewPlayer(String id) {
@@ -116,7 +121,7 @@ public class SGUtils {
                     .referrer("no-referrer-when-downgrade")
                     .get();
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error(Arrays.toString(e.getStackTrace()));
         }
         return doc;
     }

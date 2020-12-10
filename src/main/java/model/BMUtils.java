@@ -4,12 +4,18 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Locale;
 
 public class BMUtils {
+
+    private static final Logger logger = LoggerFactory.getLogger(BMUtils.class);
+
     private static final String CHERNO_SERVER_LINK = "https://www.battlemetrics.com/servers/arma3/1447962";
     private static final int UPDATE_TIME = 900_000; //15 min
 
@@ -25,7 +31,7 @@ public class BMUtils {
                         .referrer("no-referrer-when-downgrade")
                         .get();
             } catch (IOException e) {
-                e.printStackTrace();
+                logger.error(Arrays.toString(e.getStackTrace()));
             }
             if (doc != null) {
                 documentTime = Calendar.getInstance(Locale.getDefault());

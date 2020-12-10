@@ -3,18 +3,26 @@ package controller;
 import model.Model;
 import model.SGUtils;
 import model.TxtModel;
+import org.apache.log4j.BasicConfigurator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import view.ConsoleHelper;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.Arrays;
 
 public class Controller {
     private Model model = new TxtModel();
     private ConsoleHelper view = new ConsoleHelper();
 
+    private static final Logger logger = LoggerFactory.getLogger(Controller.class);
+
     public static void main(String[] args) {
 
+        // Set up a simple configuration that logs on the console.
+        BasicConfigurator.configure();
 
         Controller controller = new Controller();
         controller.getCommand();
@@ -74,7 +82,7 @@ public class Controller {
             } while (!c.toLowerCase().equals("exit"));
             reader.close();
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error(Arrays.toString(e.getStackTrace()));
         }
     }
 
@@ -121,6 +129,7 @@ public class Controller {
             view.printMessage("List of players successfully completed.");
         } catch (NumberFormatException e) {
             view.printMessage("Wrong format of the page number '%s'. Please write integer page number.", cmdArgumentN1);
+            logger.warn(Arrays.toString(e.getStackTrace()));
         }
     }
 
