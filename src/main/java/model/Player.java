@@ -1,7 +1,11 @@
 package model;
 
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlType;
 import java.io.Serializable;
 
+@XmlType(name = "player")
 public class Player implements Serializable {
 
     public static final String BM_DEFAULT_ID = "0";
@@ -52,10 +56,12 @@ public class Player implements Serializable {
         return profileLink;
     }
 
+    @XmlElement(name = "current_nickname")
     public String getTempNickName() {
         return tempNickName;
     }
 
+    @XmlElement(name = "main_nickname")
     public String getMainNickName() {
         return mainNickName;
     }

@@ -27,3 +27,4 @@ target
 # Default ignored files
 workspace.xml# Project exclude paths
 /target/
+/.idea/

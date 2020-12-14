@@ -3,6 +3,7 @@ package controller;
 import model.Model;
 import model.SGUtils;
 import model.TxtModel;
+import model.XMLModel;
 import org.apache.log4j.BasicConfigurator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,7 +15,7 @@ import java.io.InputStreamReader;
 import java.util.Arrays;
 
 public class Controller {
-    private Model model = new TxtModel();
+    private Model model = new XMLModel();
     private ConsoleHelper view = new ConsoleHelper();
 
     private static final Logger logger = LoggerFactory.getLogger(Controller.class);
