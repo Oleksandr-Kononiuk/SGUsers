@@ -316,15 +316,18 @@ public class JSONModel implements Model {
     }
 
     public void backup() {
-        try (ObjectInputStream objectInputStream =
-                     new ObjectInputStream(new FileInputStream(CURRENT_BACKUP_PATH))) {
+        try (ByteArrayInputStream jsonStream = new ByteArrayInputStream(
+                new FileInputStream(CURRENT_BACKUP_PATH).readAllBytes()))
+        {
 
-            players = (List<Player>) objectInputStream.readObject();
+            ObjectMapper mapper = new ObjectMapper();
+            JSONModel temp  = mapper.readValue(jsonStream, JSONModel.class);
+            players = temp.players;
 
-            view.printMessage("Database is updated from backup.");
-        } catch (IOException | ClassNotFoundException e) {
+        } catch (IOException e) {
             logger.error(Arrays.toString(e.getStackTrace()));
         }
+        view.printMessage("Database has been read.");
     }
 
     public void writeToDB() {

@@ -134,6 +134,6 @@ public class Controller {
     private void exit() {
         view.printMessage("Saving data base...");
         model.writeToDB();
-        System.exit(-1);
+        System.exit(0);
     }
 }
