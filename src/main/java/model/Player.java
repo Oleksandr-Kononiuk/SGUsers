@@ -1,18 +1,24 @@
 package model;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 import java.io.Serializable;
 
 @XmlType(name = "player")
+@JsonAutoDetect
 public class Player implements Serializable {
 
     public static final String BM_DEFAULT_ID = "0";
 
+    @JsonProperty("current_nickname")
     private String tempNickName;
+    @JsonProperty("main_nickname")
     private String mainNickName;
     private String family;
+    @JsonProperty("profile_link")
     private String profileLink;
     private String SGID;
     private String BMID = BM_DEFAULT_ID;
@@ -23,6 +29,8 @@ public class Player implements Serializable {
     /*
     Constructor, Getters and Setters
     */
+
+    public Player() {}
 
     public void setProfileLink(String profileLink) {
         this.profileLink = profileLink;

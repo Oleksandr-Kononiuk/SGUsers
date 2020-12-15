@@ -1,32 +1,44 @@
 package model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import view.ConsoleHelper;
 
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
-import javax.xml.bind.Unmarshaller;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.*;
 
-public class XMLModel implements Model {
+
+public class JSONModel implements Model {
+    @JsonIgnore
     private static final Logger logger = LoggerFactory.getLogger(TxtModel.class);
 
+    @JsonProperty("Players")
+    @JsonDeserialize(as = ArrayList.class)
     private List<Player> players = new ArrayList<>();
 
+    @JsonIgnore
     private ConsoleHelper view = new ConsoleHelper();
+    @JsonIgnore
     private SGUtils SG = new SGUtils();
+    @JsonIgnore
     private BMUtils BattleMetrics = new BMUtils();
 
-    private static final String CHERNO_DB_PATH = "src/main/java/model/db/xml/cherno.xml";
-    private static final String CHERNO_BACKUP_PATH = "src/main/java/model/db/xml/backup/cherno.xml";
+    @JsonIgnore
+    private static final String CHERNO_DB_PATH = "src/main/java/model/db/json/cherno.json";
+    @JsonIgnore
+    private static final String CHERNO_BACKUP_PATH = "src/main/java/model/db/json/backup/cherno.json";
+    @JsonIgnore
     private static String CURRENT_DB_PATH = CHERNO_DB_PATH;
+    @JsonIgnore
     private static String CURRENT_BACKUP_PATH = CHERNO_BACKUP_PATH;
+    @JsonIgnore
 
     /**
      * Player methods
@@ -304,25 +316,15 @@ public class XMLModel implements Model {
     }
 
     public void backup() {
-        try (ByteArrayInputStream xmlStream = new ByteArrayInputStream(
-                new FileInputStream(CURRENT_BACKUP_PATH).readAllBytes()))
-        {
+        try (ObjectInputStream objectInputStream =
+                     new ObjectInputStream(new FileInputStream(CURRENT_BACKUP_PATH))) {
 
-            try {
-                JAXBContext context = JAXBContext.newInstance(PlayersListWrapper.class); // todo try to rewrite when PlayersListWrapper will be inner class
-                Unmarshaller unmarshaller = context.createUnmarshaller();
+            players = (List<Player>) objectInputStream.readObject();
 
-                PlayersListWrapper listWrapper = (PlayersListWrapper) unmarshaller.unmarshal(xmlStream);
-                players = listWrapper.getPlayers();
-
-            } catch (JAXBException e) {
-                logger.error(Arrays.toString(e.getStackTrace()));
-            }
-
-        } catch (IOException e) {
+            view.printMessage("Database is updated from backup.");
+        } catch (IOException | ClassNotFoundException e) {
             logger.error(Arrays.toString(e.getStackTrace()));
         }
-        view.printMessage("Database restored.");
     }
 
     public void writeToDB() {
@@ -334,20 +336,13 @@ public class XMLModel implements Model {
             logger.error(Arrays.toString(e.getStackTrace()));
         }
 
-        PlayersListWrapper listWrapper = new PlayersListWrapper();
-        listWrapper.setPlayers(players);
-
         try (BufferedWriter fileWriter = new BufferedWriter(
                 new FileWriter(CURRENT_DB_PATH, false))) {
 
-            JAXBContext context = JAXBContext.newInstance(PlayersListWrapper.class);
-            Marshaller marshaller = context.createMarshaller();
-            marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
-            marshaller.marshal(listWrapper, fileWriter);
+            ObjectMapper mapper = new ObjectMapper();
+            mapper.writeValue(fileWriter, this);
 
-            fileWriter.flush();
-
-        } catch (JAXBException | IOException e) {
+        } catch (IOException e) {
             view.printMessage("Database not updated.");
             logger.error(Arrays.toString(e.getStackTrace()));
         }
@@ -356,20 +351,13 @@ public class XMLModel implements Model {
 
     public void readFromDB() {
 
-        try (ByteArrayInputStream xmlStream = new ByteArrayInputStream(
+        try (ByteArrayInputStream jsonStream = new ByteArrayInputStream(
                 new FileInputStream(CURRENT_DB_PATH).readAllBytes()))
         {
 
-            try {
-                JAXBContext context = JAXBContext.newInstance(PlayersListWrapper.class);
-                Unmarshaller unmarshaller = context.createUnmarshaller();
-
-                PlayersListWrapper listWrapper = (PlayersListWrapper) unmarshaller.unmarshal(xmlStream);
-                players = listWrapper.getPlayers();
-
-            } catch (JAXBException e) {
-                logger.error(Arrays.toString(e.getStackTrace()));
-            }
+            ObjectMapper mapper = new ObjectMapper();
+            JSONModel temp  = mapper.readValue(jsonStream, JSONModel.class);
+            players = temp.players;
 
         } catch (IOException e) {
             logger.error(Arrays.toString(e.getStackTrace()));

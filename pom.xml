@@ -34,7 +34,7 @@
             <version>1.7.5</version>
         </dependency>
 
-        <!-- XML marshaler -->
+        <!-- XML marshaller -->
         <!-- https://mvnrepository.com/artifact/org.glassfish.jaxb/jaxb-runtime -->
         <dependency>
             <groupId>org.glassfish.jaxb</groupId>
@@ -42,6 +42,29 @@
             <version>2.3.3</version>
         </dependency>
 
+        <!-- JSON marshaller -->
+        <!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind -->
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>2.9.10</version>
+        </dependency>
+
+        <!-- JSON marshaller -->
+        <!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-core -->
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-core</artifactId>
+            <version>2.9.10</version>
+        </dependency>
+
+        <!-- JSON marshaller -->
+        <!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-annotations -->
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-annotations</artifactId>
+            <version>2.9.10</version>
+        </dependency>
 
     </dependencies>
 
