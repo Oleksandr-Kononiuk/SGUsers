@@ -12,7 +12,7 @@ import java.io.InputStreamReader;
 import java.util.Arrays;
 
 public class Controller {
-    private Model model = new JSONModel();
+    private Model model = new XMLModel();
     private ConsoleHelper view = new ConsoleHelper();
 
     private static final Logger logger = LoggerFactory.getLogger(Controller.class);

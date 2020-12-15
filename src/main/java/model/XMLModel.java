@@ -8,24 +8,37 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
+import javax.xml.bind.annotation.XmlType;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.*;
 
+@XmlRootElement(name="XMLModel")
 public class XMLModel implements Model {
+    @XmlTransient
     private static final Logger logger = LoggerFactory.getLogger(TxtModel.class);
 
     private List<Player> players = new ArrayList<>();
 
+    @XmlTransient
     private ConsoleHelper view = new ConsoleHelper();
+    @XmlTransient
     private SGUtils SG = new SGUtils();
+    @XmlTransient
     private BMUtils BattleMetrics = new BMUtils();
 
+    @XmlTransient
     private static final String CHERNO_DB_PATH = "src/main/java/model/db/xml/cherno.xml";
+    @XmlTransient
     private static final String CHERNO_BACKUP_PATH = "src/main/java/model/db/xml/backup/cherno.xml";
+    @XmlTransient
     private static String CURRENT_DB_PATH = CHERNO_DB_PATH;
+    @XmlTransient
     private static String CURRENT_BACKUP_PATH = CHERNO_BACKUP_PATH;
 
     /**
@@ -309,10 +322,10 @@ public class XMLModel implements Model {
         {
 
             try {
-                JAXBContext context = JAXBContext.newInstance(PlayersListWrapper.class); // todo try to rewrite when PlayersListWrapper will be inner class
+                JAXBContext context = JAXBContext.newInstance(XMLModel.class);
                 Unmarshaller unmarshaller = context.createUnmarshaller();
 
-                PlayersListWrapper listWrapper = (PlayersListWrapper) unmarshaller.unmarshal(xmlStream);
+                XMLModel listWrapper = (XMLModel) unmarshaller.unmarshal(xmlStream);
                 players = listWrapper.getPlayers();
 
             } catch (JAXBException e) {
@@ -334,16 +347,14 @@ public class XMLModel implements Model {
             logger.error(Arrays.toString(e.getStackTrace()));
         }
 
-        PlayersListWrapper listWrapper = new PlayersListWrapper();
-        listWrapper.setPlayers(players);
-
         try (BufferedWriter fileWriter = new BufferedWriter(
-                new FileWriter(CURRENT_DB_PATH, false))) {
+                new FileWriter(CURRENT_DB_PATH, false)))
+        {
 
-            JAXBContext context = JAXBContext.newInstance(PlayersListWrapper.class);
+            JAXBContext context = JAXBContext.newInstance(XMLModel.class);
             Marshaller marshaller = context.createMarshaller();
             marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
-            marshaller.marshal(listWrapper, fileWriter);
+            marshaller.marshal(this, fileWriter);
 
             fileWriter.flush();
 
@@ -361,10 +372,10 @@ public class XMLModel implements Model {
         {
 
             try {
-                JAXBContext context = JAXBContext.newInstance(PlayersListWrapper.class);
+                JAXBContext context = JAXBContext.newInstance(XMLModel.class);
                 Unmarshaller unmarshaller = context.createUnmarshaller();
 
-                PlayersListWrapper listWrapper = (PlayersListWrapper) unmarshaller.unmarshal(xmlStream);
+                XMLModel listWrapper = (XMLModel) unmarshaller.unmarshal(xmlStream);
                 players = listWrapper.getPlayers();
 
             } catch (JAXBException e) {
@@ -384,6 +395,7 @@ public class XMLModel implements Model {
         this.players = players;
     }
 
+    @XmlElement(name="Player")
     public List<Player> getPlayers() {
         return players;
     }
