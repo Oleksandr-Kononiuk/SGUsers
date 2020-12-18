@@ -66,6 +66,15 @@
             <version>2.9.10</version>
         </dependency>
 
+        <!-- MySQL Connector/J -->
+        <!-- https://mvnrepository.com/artifact/mysql/mysql-connector-java -->
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+            <version>8.0.21</version>
+        </dependency>
+
+
     </dependencies>
 
 </project>

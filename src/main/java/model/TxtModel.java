@@ -39,6 +39,7 @@ public class TxtModel implements Externalizable, Model {
      * Player methods
      */
 
+    @Override
     public void addNewPlayer(String SGProfileLink) {
         String SGID = SGProfileLink.substring(SGProfileLink.length() - 17);
         Player newPlayer = SG.getNewPlayer(SGID);
@@ -52,6 +53,7 @@ public class TxtModel implements Externalizable, Model {
         }
     }
 
+    @Override
     public void deletePlayer(String nickNameOrBMID) {
         Player p;
 
@@ -64,11 +66,13 @@ public class TxtModel implements Externalizable, Model {
         }
     }
 
+    @Override
     public void updatePlayer(String nameOrLinkOrId) {
         Player p = getPlayer(nameOrLinkOrId);
         updatePlayer(p);
     }
 
+    @Override
     public void searchPlayer(String nameOrLinkOrId) {
         List<Player> s = new ArrayList<>();
 
@@ -95,6 +99,7 @@ public class TxtModel implements Externalizable, Model {
         }
     }
 
+    @Override
     public void printAllPlayers() {
         if (players.size() == 0) {
             view.printMessage("Players data base is empty.");
@@ -106,6 +111,7 @@ public class TxtModel implements Externalizable, Model {
         }
     }
 
+    @Override
     public void addAdmin(String name) {
         Player admin = new Player();
         admin.setAdmin(true);
@@ -117,6 +123,7 @@ public class TxtModel implements Externalizable, Model {
         view.printMessage("Admin '%s' is created and added in database.", admin.getMainNickName());
     }
 
+    @Override
     public void setAdmin(String nickNameOrBMID) {
         Player p = getPlayer(nickNameOrBMID);
         if (p != null) {
@@ -127,6 +134,7 @@ public class TxtModel implements Externalizable, Model {
             view.printMessage("Player '%s' not found.", nickNameOrBMID);
     }
 
+    @Override
     public void deleteAdmin(String nickNameOrBMID) {
         Player p = getPlayer(nickNameOrBMID);
         if (p != null) {
@@ -137,6 +145,7 @@ public class TxtModel implements Externalizable, Model {
             view.printMessage("Player '%s' not found", nickNameOrBMID);
     }
 
+    @Override
     public void getBMID(String nickNameOrBMID) {
         Player player = getPlayer(nickNameOrBMID);
         if (player != null) {
@@ -176,6 +185,7 @@ public class TxtModel implements Externalizable, Model {
      * Family methods
      */
 
+    @Override
     public void deleteFamily(String familyName) {
         List<Player> f = getFamilyMembers(familyName);
         if (f.size() > 0) {
@@ -187,6 +197,7 @@ public class TxtModel implements Externalizable, Model {
         }
     }
 
+    @Override
     public void updateFamily(String familyName) {
         List<Player> f = getFamilyMembers(familyName);
 
@@ -202,6 +213,7 @@ public class TxtModel implements Externalizable, Model {
     }
 
     //print family with online status of members
+    @Override
     public void printFamily(String familyName) {
         List<Player> f = getFamilyMembers(familyName);
         if (f.size() > 0) {
@@ -215,6 +227,7 @@ public class TxtModel implements Externalizable, Model {
     }
 
     //print all family without online status of members
+    @Override
     public void printAllFamilies() {
         Set<String> familiesName = new HashSet<>();
 
@@ -228,6 +241,7 @@ public class TxtModel implements Externalizable, Model {
         }
     }
 
+    @Override
     public void topFamilies() {
         int topTen = 10;
         for (Map.Entry<List<Player>, String> entry : getAllFamilies().entrySet()) {
@@ -237,6 +251,7 @@ public class TxtModel implements Externalizable, Model {
         }
     }
 
+    @Override
     public void searchAllAdmins() {
         List<Player> admins = getAdmins();
 
@@ -249,6 +264,7 @@ public class TxtModel implements Externalizable, Model {
         }
     }
 
+    @Override
     public void totals() {
         view.printMessage("Total players in data base is '%d'.", players.size());
         view.printMessage("Total families in data base is '%d'.", getAllFamilies().size());
@@ -304,12 +320,14 @@ public class TxtModel implements Externalizable, Model {
      * DB methods
      */
 
+    @Override
     public void clearAll() {
         players.clear();
         view.printMessage("Database was cleared.");
         //writeToDB(); //todo when all will works fine, delete comment
     }
 
+    @Override
     public void backup() {
         try (ObjectInputStream objectInputStream =
                      new ObjectInputStream(new FileInputStream(CURRENT_BACKUP_PATH))) {
@@ -322,6 +340,7 @@ public class TxtModel implements Externalizable, Model {
         }
     }
 
+    @Override
     public void writeToDB() {
         //create backup
         try {
@@ -343,6 +362,7 @@ public class TxtModel implements Externalizable, Model {
         }
     }
 
+    @Override
     public void readFromDB() {
         try (ObjectInputStream objectInputStream =
                      new ObjectInputStream(new FileInputStream(CURRENT_DB_PATH))) {
@@ -354,6 +374,18 @@ public class TxtModel implements Externalizable, Model {
             view.printMessage("Data base was not found. " +
                     "Please use command !fill-players and !rebuild-families to create new Data base.");
             logger.error(Arrays.toString(e.getStackTrace()));
+        }
+    }
+
+    @Override
+    public void fillPlayers(String cmdArgumentN1) {
+        try {
+            int pages = Integer.parseInt(cmdArgumentN1);
+            players = new SGUtils().getUsersFromPages(pages);
+            view.printMessage("List of players successfully completed.");
+        } catch (NumberFormatException e) {
+            view.printMessage("Wrong format of the page number '%s'. Please write integer page number.", cmdArgumentN1);
+            logger.warn(Arrays.toString(e.getStackTrace()));
         }
     }
 
@@ -370,6 +402,8 @@ public class TxtModel implements Externalizable, Model {
     /**
      * Geters and Seters
      */
+
+    @Override
     public void setPlayers(List<Player> players) {
         this.players = players;
     }

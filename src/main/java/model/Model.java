@@ -2,6 +2,7 @@ package model;
 
 import java.util.List;
 
+//DAO
 public interface Model {
 
     void addNewPlayer(String SGProfileLink);
@@ -51,6 +52,8 @@ public interface Model {
     void writeToDB();
 
     void readFromDB();
+
+    void fillPlayers(String cmdArgumentN1);
 
     void setPlayers(List<Player> players);
 }

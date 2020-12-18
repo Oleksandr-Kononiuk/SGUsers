@@ -12,7 +12,7 @@ import java.io.InputStreamReader;
 import java.util.Arrays;
 
 public class Controller {
-    private Model model = new XMLModel();
+    private Model model = new JDBCModel();
     private ConsoleHelper view = new ConsoleHelper();
 
     private static final Logger logger = LoggerFactory.getLogger(Controller.class);
@@ -73,7 +73,7 @@ public class Controller {
                     case "!exit" : exit(); break;//+
 
                     //others commands
-                    case "!fill-players" : fillPlayers(cmdArgN1); break;//+
+                    case "!fill-players" : model.fillPlayers(cmdArgN1); break;//+
                     case "!help" : help(); break;//+
                     default: view.printMessage("Wrong command format. Please try again or write '!exit' for close app.");
                 }
@@ -118,17 +118,6 @@ public class Controller {
                 "\n" +
                 "!fill-players       - reads player data from X pages. The process is long and may fail.\n" +
                 "!help               - displays a list of commands with a description.\n");
-    }
-
-    private void fillPlayers(String cmdArgumentN1) {
-        try {
-            int pages = Integer.parseInt(cmdArgumentN1);
-            model.setPlayers(new SGUtils().getUsersFromPages(pages));
-            view.printMessage("List of players successfully completed.");
-        } catch (NumberFormatException e) {
-            view.printMessage("Wrong format of the page number '%s'. Please write integer page number.", cmdArgumentN1);
-            logger.warn(Arrays.toString(e.getStackTrace()));
-        }
     }
 
     private void exit() {

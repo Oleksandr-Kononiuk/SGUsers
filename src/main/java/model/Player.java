@@ -7,6 +7,7 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
 import java.io.Serializable;
 
+//Entity for DAO pattern
 @XmlType(name = "player")
 @JsonAutoDetect
 public class Player implements Serializable {
