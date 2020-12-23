@@ -150,7 +150,7 @@ public class TxtModel implements Externalizable, Model {
         Player player = getPlayer(nickNameOrBMID);
         if (player != null) {
             if (BattleMetrics.isOnline(player.getTempNickName())) {
-                player.setBMID(BattleMetrics.getBMID(player));
+                player.setBMID(BattleMetrics.getBMID(player.getTempNickName()));
                 writeToDB();
                 view.printMessage("'%s' battlemetrics id changed on %s", player.getTempNickName(), player.getBMID());
             } else {
@@ -368,7 +368,7 @@ public class TxtModel implements Externalizable, Model {
                      new ObjectInputStream(new FileInputStream(CURRENT_DB_PATH))) {
 
             players = (List<Player>) objectInputStream.readObject();
-
+//todo add copy
             view.printMessage("Database was read success.");
         } catch (IOException | ClassNotFoundException e) {
             view.printMessage("Data base was not found. " +

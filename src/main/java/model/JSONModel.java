@@ -155,7 +155,7 @@ public class JSONModel implements Model {
         Player player = getPlayer(nickNameOrBMID);
         if (player != null) {
             if (BattleMetrics.isOnline(player.getTempNickName())) {
-                player.setBMID(BattleMetrics.getBMID(player));
+                player.setBMID(BattleMetrics.getBMID(player.getTempNickName()));
                 writeToDB();
                 view.printMessage("'%s' battlemetrics id changed on %s", player.getTempNickName(), player.getBMID());
             } else {
