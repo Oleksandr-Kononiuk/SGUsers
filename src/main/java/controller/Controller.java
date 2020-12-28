@@ -10,6 +10,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Arrays;
+import java.util.Random;
 
 public class Controller {
     private Model model = new JDBCModel();
@@ -27,8 +28,7 @@ public class Controller {
     }
 
     private void getCommand() {
-        try {
-            BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(System.in))) {
             String c;
             do {
                 c = reader.readLine();
@@ -46,30 +46,30 @@ public class Controller {
 
                 switch (command.toLowerCase()) {
                     //player commands
-                    case "!add-player" : model.addNewPlayer(cmdArgN1); break;//+
-                    case "!delete-player" : model.deletePlayer(cmdArgN1); break;//+
-                    case "!update-player" : model.updatePlayer(cmdArgN1); break;
-                    case "!add-admin" : model.addAdmin(cmdArgN1); break;//+
-                    case "!set-admin" : model.setAdmin(cmdArgN1); break;//+
-                    case "!delete-admin" : model.deleteAdmin(cmdArgN1); break;//+
-                    case "!get-bmid" : model.getBMID(cmdArgN1); break;//+
-                    case "!print-players" : model.printAllPlayers(); break;//+
-                    case "!search-player" : model.searchPlayer(cmdArgN1); break; //+
+                    case "!add-player" : model.addNewPlayer(cmdArgN1); break;//++
+                    case "!delete-player" : model.deletePlayer(cmdArgN1); break;//++
+                    case "!update-player" : model.updatePlayer(cmdArgN1); break;//++
+                    case "!add-admin" : model.addAdmin(cmdArgN1); break;//++
+                    case "!set-admin" : model.setAdmin(cmdArgN1); break;//++
+                    case "!delete-admin" : model.deleteAdmin(cmdArgN1); break;//++
+                    case "!get-bmid" : model.getBMID(cmdArgN1); break;//++
+                    case "!print-players" : model.printAllPlayers(); break;//++
+                    case "!search-player" : model.searchPlayer(cmdArgN1); break; //++
 
                     //family commands
-                    case "!delete-family" : model.deleteFamily(cmdArgN1); break;//+
+                    case "!delete-family" : model.deleteFamily(cmdArgN1); break;//++
                     case "!print-families" : model.printAllFamilies(); break;//+
-                    case "!search-family" : model.printFamily(cmdArgN1); break;//+
+                    case "!search-family" : model.printFamily(cmdArgN1); break;//++
                     case "!update-family" : model.updateFamily(cmdArgN1); break; //+
                     case "!top" : model.topFamilies(); break;//+
-                    case "!admins" : model.searchAllAdmins(); break;//+
+                    case "!admins" : model.searchAllAdmins(); break;//++
                     case "!totals" : model.totals(); break;//+
 
                     //db commands
-                    case "!save" : model.writeToDB(); break;//+
-                    case "!get" : model.readFromDB(); break;//+
-                    case "!backup" : model.backup(); break;//+
-                    case "!clear-all" : model.clearAll(); break;//+
+                    case "!save" : model.writeToDB(); break;//++
+                    case "!get" : model.readFromDB(); break;//++
+                    case "!backup" : model.backup(); break;//++
+                    case "!clear-all" : model.clearAll(); break;//++
                     case "!exit" : exit(); break;//+
 
                     //others commands
@@ -78,7 +78,6 @@ public class Controller {
                     default: view.printMessage("Wrong command format. Please try again or write '!exit' for close app.");
                 }
             } while (!c.toLowerCase().equals("exit"));
-            reader.close();
         } catch (IOException e) {
             logger.error(Arrays.toString(e.getStackTrace()));
         }
