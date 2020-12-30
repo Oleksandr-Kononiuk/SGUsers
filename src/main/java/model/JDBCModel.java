@@ -328,20 +328,36 @@ public class JDBCModel implements Model {
 
     @Override
     public void printAllFamilies() {
-        Map<List<Player>, String> families = getAllFamilies();
+        Map<String, List<Player>> families = getAllFamilies();
         view.printMessage("Families count = '%d'.", families.size());
 
-        for (Map.Entry<List<Player>, String> entry : families.entrySet()) {
-            view.printFamily(entry.getKey());
+        for (Map.Entry<String, List<Player>> entry : families.entrySet()) {
+            view.printFamily(entry.getValue());
         }
     }
 
     @Override
     public void topFamilies() {
+        List<List<Player>> sortedList = new ArrayList<>();
+        for (Map.Entry<String, List<Player>> entry : getAllFamilies().entrySet()) {
+            sortedList.add(entry.getValue());
+        }
+        sortedList.sort(new Comparator<List<Player>>() {
+            @Override
+            public int compare(List<Player> o1, List<Player> o2) {
+                if (o1.size() < o2.size()) {
+                    return 1;
+                } else if (o1.size() > o2.size()) {
+                    return -1;
+                } else {
+                    return 0;
+                }
+            }
+        });
         int topTen = 10;
-        for (Map.Entry<List<Player>, String> entry : getAllFamilies().entrySet()) {
-            if (topTen == 1) break;
-            view.printFamily(entry.getKey());
+        for (List<Player> list : sortedList) {
+            if (topTen == 0) break;
+            view.printFamily(list);
             topTen--;
         }
     }
@@ -411,17 +427,9 @@ public class JDBCModel implements Model {
         return admins;
     }
 
-    //todo incorrect work
-    private Map<List<Player>, String> getAllFamilies() {
+    private Map<String, List<Player>> getAllFamilies() {
         Set<String> familiesName = new HashSet<>();
-        Map<List<Player>, String> families = new TreeMap<>((o1, o2) -> {
-            if (o1.size() < o2.size()) {
-                return -1;
-            } else if (o1.size() > o2.size()) {
-                return 1;
-            } else
-                return 0;
-        });
+        Map<String, List<Player>> familiesMemberList = new HashMap<>();
 
         String sql = "SELECT DISTINCT family " +
                     "FROM player;";
@@ -433,13 +441,13 @@ public class JDBCModel implements Model {
                 familiesName.add(rs.getString("family"));
             }
             for (String s : familiesName) {
-                families.put(getFamilyMembers(s), s);
+                familiesMemberList.put(s, getFamilyMembers(s));
             }
         } catch (SQLException e) {
             e.printStackTrace();
             //logger.error(Arrays.toString(e.getStackTrace()));
         }
-        return families;
+        return familiesMemberList;
     }
 
     private List<Player> getFamilyMembers(String familyName) {

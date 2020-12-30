@@ -243,10 +243,26 @@ public class TxtModel implements Externalizable, Model {
 
     @Override
     public void topFamilies() {
+        List<List<Player>> sortedList = new ArrayList<>();
+        for (Map.Entry<String, List<Player>> entry : getAllFamilies().entrySet()) {
+            sortedList.add(entry.getValue());
+        }
+        sortedList.sort(new Comparator<List<Player>>() {
+            @Override
+            public int compare(List<Player> o1, List<Player> o2) {
+                if (o1.size() < o2.size()) {
+                    return 1;
+                } else if (o1.size() > o2.size()) {
+                    return -1;
+                } else {
+                    return 0;
+                }
+            }
+        });
         int topTen = 10;
-        for (Map.Entry<List<Player>, String> entry : getAllFamilies().entrySet()) {
-            if (topTen == 1) break;
-            view.printFamily(entry.getKey());
+        for (List<Player> list : sortedList) {
+            if (topTen == 0) break;
+            view.printFamily(list);
             topTen--;
         }
     }
@@ -296,22 +312,15 @@ public class TxtModel implements Externalizable, Model {
         return f;
     }
 
-    private Map<List<Player>, String> getAllFamilies() {
+    private Map<String, List<Player>> getAllFamilies() {
         Set<String> familiesName = new HashSet<>();
-        Map<List<Player>, String> families = new TreeMap<>((o1, o2) -> {
-            if (o1.size() < o2.size()) {
-                return -1;
-            } else if (o1.size() > o2.size()) {
-                return 1;
-            } else
-                return 0;
-        });
+        Map<String, List<Player>> families = new HashMap<>();
 
         for (Player p : players) {
             familiesName.add(p.getFamily());
         }
         for (String s : familiesName) {
-            families.put(getFamilyMembers(s), s);
+            families.put(s, getFamilyMembers(s));
         }
         return families;
     }
