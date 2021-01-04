@@ -338,13 +338,12 @@ public class TxtModel implements Externalizable, Model {
 
     @Override
     public void backup() {
-        try (ObjectInputStream objectInputStream =
-                     new ObjectInputStream(new FileInputStream(CURRENT_BACKUP_PATH))) {
-
-            players = (List<Player>) objectInputStream.readObject();
-
-            view.printMessage("Database is updated from backup.");
-        } catch (IOException | ClassNotFoundException e) {
+        try {
+            Files.copy(Paths.get(CURRENT_BACKUP_PATH), Paths.get(CURRENT_DB_PATH), StandardCopyOption.REPLACE_EXISTING);
+            readFromDB();
+            view.printMessage("Database was restored.");
+        } catch (IOException e) {
+            view.printMessage("Backup not created.");
             logger.error(Arrays.toString(e.getStackTrace()));
         }
     }
@@ -355,7 +354,7 @@ public class TxtModel implements Externalizable, Model {
         try {
             Files.copy(Paths.get(CURRENT_DB_PATH), Paths.get(CURRENT_BACKUP_PATH), StandardCopyOption.REPLACE_EXISTING);
         } catch (IOException e) {
-            view.printMessage("Database not updated.");
+            view.printMessage("Backup not created.");
             logger.error(Arrays.toString(e.getStackTrace()));
         }
 

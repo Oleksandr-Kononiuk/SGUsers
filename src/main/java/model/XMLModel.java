@@ -344,25 +344,14 @@ public class XMLModel implements Model {
 
     @Override
     public void backup() {
-        try (ByteArrayInputStream xmlStream = new ByteArrayInputStream(
-                new FileInputStream(CURRENT_BACKUP_PATH).readAllBytes()))
-        {
-
-            try {
-                JAXBContext context = JAXBContext.newInstance(XMLModel.class);
-                Unmarshaller unmarshaller = context.createUnmarshaller();
-
-                XMLModel listWrapper = (XMLModel) unmarshaller.unmarshal(xmlStream);
-                players = listWrapper.getPlayers();
-
-            } catch (JAXBException e) {
-                logger.error(Arrays.toString(e.getStackTrace()));
-            }
-
+        try {
+            Files.copy(Paths.get(CURRENT_BACKUP_PATH), Paths.get(CURRENT_DB_PATH), StandardCopyOption.REPLACE_EXISTING);
+            readFromDB();
+            view.printMessage("Database was restored.");
         } catch (IOException e) {
+            view.printMessage("Backup not created.");
             logger.error(Arrays.toString(e.getStackTrace()));
         }
-        view.printMessage("Database restored.");
     }
 
     @Override
@@ -395,7 +384,6 @@ public class XMLModel implements Model {
 
     @Override
     public void readFromDB() {
-
         try (ByteArrayInputStream xmlStream = new ByteArrayInputStream(
                 new FileInputStream(CURRENT_DB_PATH).readAllBytes()))
         {
@@ -405,12 +393,10 @@ public class XMLModel implements Model {
                 Unmarshaller unmarshaller = context.createUnmarshaller();
 
                 XMLModel listWrapper = (XMLModel) unmarshaller.unmarshal(xmlStream);
-                players = listWrapper.getPlayers();
-
-            } catch (JAXBException e) {
+                players = new ArrayList<>(listWrapper.getPlayers());
+            } catch (JAXBException|NullPointerException e) {
                 logger.error(Arrays.toString(e.getStackTrace()));
             }
-
         } catch (IOException e) {
             logger.error(Arrays.toString(e.getStackTrace()));
         }

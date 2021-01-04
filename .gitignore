@@ -28,3 +28,5 @@ target
 workspace.xml# Project exclude paths
 /target/
 /.idea/
+/src/main/java/model/db/txt/
+/src/main/java/model/db/txt/cherno.txt

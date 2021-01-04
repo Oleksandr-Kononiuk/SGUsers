@@ -343,18 +343,14 @@ public class JSONModel implements Model {
 
     @Override
     public void backup() {
-        try (ByteArrayInputStream jsonStream = new ByteArrayInputStream(
-                new FileInputStream(CURRENT_BACKUP_PATH).readAllBytes()))
-        {
-
-            ObjectMapper mapper = new ObjectMapper();
-            JSONModel temp  = mapper.readValue(jsonStream, JSONModel.class);
-            players = temp.players;
-
+        try {
+            Files.copy(Paths.get(CURRENT_BACKUP_PATH), Paths.get(CURRENT_DB_PATH), StandardCopyOption.REPLACE_EXISTING);
+            readFromDB();
+            view.printMessage("Database was restored.");
         } catch (IOException e) {
+            view.printMessage("Backup not created.");
             logger.error(Arrays.toString(e.getStackTrace()));
         }
-        view.printMessage("Database has been read.");
     }
 
     @Override
