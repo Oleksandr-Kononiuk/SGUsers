@@ -28,7 +28,7 @@ CREATE TABLE IF NOT EXISTS `sgusers`.`Player` (
   `sgid` VARCHAR(17) NOT NULL,
   `bmid` VARCHAR(10) NOT NULL DEFAULT 0,
   `isAdmin` TINYINT(1) NOT NULL DEFAULT 0,
-  PRIMARY KEY (`tempNickName`))
+  PRIMARY KEY (`sgid`))
 ENGINE = InnoDB;
 
 
