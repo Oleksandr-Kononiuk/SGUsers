@@ -17,7 +17,7 @@ import java.util.*;
 
 public class JSONModel implements Model {
     @JsonIgnore
-    private static final Logger logger = LoggerFactory.getLogger(TxtModel.class);
+    private static final Logger logger = LoggerFactory.getLogger(JSONModel.class);
 
     @JsonProperty("Players")
     @JsonDeserialize(as = ArrayList.class)

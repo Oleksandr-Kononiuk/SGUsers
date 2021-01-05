@@ -17,7 +17,7 @@ public class JDBCModel implements Model {
 
     //private List<Player> players = new ArrayList<>();
 
-    private static final Logger logger = LoggerFactory.getLogger(TxtModel.class);
+    private static final Logger logger = LoggerFactory.getLogger(JDBCModel.class);
     private ConsoleHelper view = new ConsoleHelper();
     private SGUtils SG = new SGUtils();
     private BMUtils BattleMetrics = new BMUtils();
@@ -55,23 +55,29 @@ public class JDBCModel implements Model {
         Player newPlayer = SG.getNewPlayer(SGID);
 
         if (newPlayer != null) {
+            Savepoint sp = null;
             String sql = String.format("INSERT INTO player(sgid, tempNickName, mainNickName, family, isAdmin, bmid, profileLink)" +
                             "VALUES ('%1$s', '%2$s', '%3$s', '%4$s', %5$b, '%6$s', '%7$s')",
                     newPlayer.getSGID(), newPlayer.getTempNickName(), newPlayer.getMainNickName(), newPlayer.getFamily(),
                     newPlayer.isAdmin(), newPlayer.getBMID(), newPlayer.getProfileLink());
 
             try (Statement statement = connection.createStatement()) {
+                connection.setAutoCommit(false);
+                sp = connection.setSavepoint("Before_adding_new_player");
                 int isAdded = statement.executeUpdate(sql);
 
-                if (isAdded > 0)
+                if (isAdded > 0) {
+                    connection.commit();
+                    connection.setAutoCommit(true);
                     view.printMessage("New player '%s' was added.", newPlayer.getTempNickName());
-                else
+                } else {
                     view.printMessage("New player '%s' wasn`t added.", SGID);
+                }
 
             } catch (SQLIntegrityConstraintViolationException e) {
                 updatePlayer(newPlayer.getSGID());
-
             } catch (SQLException e) {
+                rollback(sp);
                 e.printStackTrace();
                 //logger.error(Arrays.toString(e.getStackTrace()));
             }
@@ -82,20 +88,27 @@ public class JDBCModel implements Model {
 
     @Override
     public void deletePlayer(String SGID) {
+        Savepoint sp = null;
         String sql = "DELETE FROM player WHERE sgid = ? LIMIT 1";
 
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setString(1, SGID);
             statement.setString(2, SGID);
 
+            connection.setAutoCommit(false);
+            sp = connection.setSavepoint("Before_deleting_player");
             int isDeleted = statement.executeUpdate();
 
-            if (isDeleted > 0)
+            if (isDeleted > 0) {
+                connection.commit();
+                connection.setAutoCommit(true);
                 view.printMessage("Player '%s' was deleted from data base.", SGID);
-            else
+            } else {
                 view.printMessage("Player wasn`t deleted from data base or not found.");
+            }
 
         } catch (SQLException e) {
+            rollback(sp);
             e.printStackTrace();
             //logger.error(Arrays.toString(e.getStackTrace()));
         }
@@ -141,7 +154,7 @@ public class JDBCModel implements Model {
     @Override
     public void updatePlayer(String SGID) {
         Player player = SG.getNewPlayer(SGID);
-
+        Savepoint sp = null;
         String updateSQL = String.format("UPDATE player " +
                         "SET tempNickName = '%2$s', mainNickName = '%3$s', family = '%4$s', isAdmin = %5$b, bmid = '%6$s', profileLink = '%7$s' " +
                         "WHERE sgid = '%1$s';",
@@ -149,13 +162,19 @@ public class JDBCModel implements Model {
                 player.isAdmin(), player.getBMID(), player.getProfileLink());
 
         try (Statement statement = connection.createStatement()) {
+            connection.setAutoCommit(false);
+            sp = connection.setSavepoint("Before_updating_player");
             int isUpdated = statement.executeUpdate(updateSQL);
 
-            if (isUpdated > 0)
+            if (isUpdated > 0) {
+                connection.commit();
+                connection.setAutoCommit(true);
                 view.printMessage("Player '%s' was updated because he is exists in database.", player.getTempNickName());
-            else
+            } else {
                 view.printMessage("New player '%s' wasn`t updated.", SGID);
+            }
         } catch (SQLException ex) {
+            rollback(sp);
             ex.printStackTrace();
             //logger.error(Arrays.toString(e.getStackTrace()));
         }
@@ -200,21 +219,27 @@ public class JDBCModel implements Model {
         for(int i = 0; i < 3; i++ ) {
             adminRandomSGID.append(digits.charAt(new Random().nextInt(digits.length())));
         }
-
+        Savepoint sp = null;
         String sql = String.format("INSERT INTO player(sgid, tempNickName, mainNickName, family, isAdmin, bmid, profileLink)" +
                         "VALUES ('%1$s', '%2$s', '%3$s', '%4$s', %5$b, '%6$s', '%7$s')",
                 adminRandomSGID.toString(), name, name, "[Null]",
                 true, "0", "[Null]");
 
         try (Statement statement = connection.createStatement()) {
+            connection.setAutoCommit(false);
+            sp = connection.setSavepoint("Before_adding_admin");
             int isAdded = statement.executeUpdate(sql);
 
-            if (isAdded > 0)
+            if (isAdded > 0) {
+                connection.commit();
+                connection.setAutoCommit(true);
                 view.printMessage("New admin '%s' was added.", name);
-            else
+            } else {
                 view.printMessage("New player '%s' wasn`t added.", name);
+            }
 
         } catch (SQLException e) {
+            rollback(sp);
             e.printStackTrace();
             //logger.error(Arrays.toString(e.getStackTrace()));
         }
@@ -226,19 +251,25 @@ public class JDBCModel implements Model {
             view.printMessage("Try again. '0' is default BMID.");
             return;
         }
+        Savepoint sp = null;
         String sql = String.format("UPDATE player " +
                         "SET isAdmin = true " +
                         "WHERE sgid = '%1$s' OR bmid = '%1$s' OR tempNickName = '%1$s';", nickNameOrBMIDOrSGID);
 
         try (Statement statement = connection.createStatement()) {
+            connection.setAutoCommit(false);
+            sp = connection.setSavepoint("Before_changing_admin_status");
             int isAdmin = statement.executeUpdate(sql);
 
-            if (isAdmin > 0)
+            if (isAdmin > 0) {
+                connection.commit();
+                connection.setAutoCommit(true);
                 view.printMessage("Player '%s' is admin now.", nickNameOrBMIDOrSGID);
-            else
+            } else {
                 view.printMessage("Player '%s' not found.", nickNameOrBMIDOrSGID);
-
+            }
         } catch (SQLException e) {
+            rollback(sp);
             e.printStackTrace();
             //logger.error(Arrays.toString(e.getStackTrace()));
         }
@@ -250,19 +281,25 @@ public class JDBCModel implements Model {
             view.printMessage("Try again. '0' is default BMID.");
             return;
         }
+        Savepoint sp = null;
         String sql = String.format("UPDATE player " +
                 "SET isAdmin = false " +
                 "WHERE sgid = '%1$s' OR bmid = '%1$s' OR tempNickName = '%1$s';", nickNameOrBMIDOrSGID);
 
         try (Statement statement = connection.createStatement()) {
+            connection.setAutoCommit(false);
+            sp = connection.setSavepoint("Before_changing_admin_status");
             int isAdmin = statement.executeUpdate(sql);
 
-            if (isAdmin > 0)
+            if (isAdmin > 0) {
+                connection.commit();
+                connection.setAutoCommit(true);
                 view.printMessage("Player '%s' is not admin now.", nickNameOrBMIDOrSGID);
-            else
+            } else {
                 view.printMessage("Player '%s' not found.", nickNameOrBMIDOrSGID);
-
+            }
         } catch (SQLException e) {
+            rollback(sp);
             e.printStackTrace();
             //logger.error(Arrays.toString(e.getStackTrace()));
         }
@@ -272,20 +309,26 @@ public class JDBCModel implements Model {
     public void getBMID(String nickName) {
         if (BattleMetrics.isOnline(nickName)) {
             String bmid = BattleMetrics.getBMID(nickName);
-
+            Savepoint sp = null;
             String sql = String.format("UPDATE player " +
                     "SET bmid = '%1$s' " +
                     "WHERE tempNickName = '%2$s';", bmid, nickName);
 
             try (Statement statement = connection.createStatement()) {
+                connection.setAutoCommit(false);
+                sp = connection.setSavepoint("Before_changing_bmid");
+
                 int isChanged = statement.executeUpdate(sql);
 
-                if (isChanged > 0)
+                if (isChanged > 0) {
+                    connection.commit();
+                    connection.setAutoCommit(true);
                     view.printMessage("Player '%s' BMID has been changed to '%s'", nickName, bmid);
-                else
+                } else {
                     view.printMessage("Player '%s' not found.", nickName);
-
+                }
             } catch (SQLException e) {
+                rollback(sp);
                 e.printStackTrace();
                 //logger.error(Arrays.toString(e.getStackTrace()));
             }
@@ -293,22 +336,28 @@ public class JDBCModel implements Model {
             view.printMessage("Player '%s' must be online", nickName);
         }
     }
-
+    //todo family name have 2+ words
     @Override
     public void deleteFamily(String familyName) {
+        Savepoint sp = null;
         String sql = String.format("DELETE FROM player " +
                                     "WHERE family = '%1$s';", familyName);
-//todo family name have 2+ words
+
         try (Statement statement = connection.createStatement()) {
+            connection.setAutoCommit(false);
+            sp = connection.setSavepoint("Before_deleting_family");
 
             int isDeleted = statement.executeUpdate(sql);
 
-            if (isDeleted > 0)
+            if (isDeleted > 0) {
+                connection.commit();
+                connection.setAutoCommit(true);
                 view.printMessage("Players from family '%s' was deleted from data base.", familyName);
-            else
+            } else {
                 view.printMessage("Family wasn`t deleted from data base or not found.");
-
+            }
         } catch (SQLException e) {
+            rollback(sp);
             e.printStackTrace();
             //logger.error(Arrays.toString(e.getStackTrace()));
         }
@@ -481,19 +530,36 @@ public class JDBCModel implements Model {
 
     @Override
     public void clearAll() {
+        Savepoint sp = null;
         String sql = "DELETE FROM player";
         try (Statement statement = connection.createStatement()) {
+            connection.setAutoCommit(false);
+            sp = connection.setSavepoint("Before_clean_all");
 
             int isDeleted = statement.executeUpdate(sql);
 
-            if (isDeleted > 0)
+            if (isDeleted > 0) {
+                connection.commit();
+                connection.setAutoCommit(true);
                 view.printMessage("Database was cleared.");
-            else
+            } else {
                 view.printMessage("Database wasn`t cleared.");
-
+            }
         } catch (SQLException e) {
+            rollback(sp);
             e.printStackTrace();
             //logger.error(Arrays.toString(e.getStackTrace()));
+        }
+    }
+
+    private void rollback(Savepoint sp) { //todo implement the same method commit
+        try {
+            connection.rollback(sp);
+            connection.releaseSavepoint(sp);
+            connection.setAutoCommit(true);
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+            //logger.error(Arrays.toString(ex.getStackTrace()));
         }
     }
 

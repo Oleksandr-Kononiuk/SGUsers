@@ -21,7 +21,7 @@ import java.util.*;
 @XmlRootElement(name="XMLModel")
 public class XMLModel implements Model {
     @XmlTransient
-    private static final Logger logger = LoggerFactory.getLogger(TxtModel.class);
+    private static final Logger logger = LoggerFactory.getLogger(XMLModel.class);
 
     private List<Player> players = new ArrayList<>();
 
