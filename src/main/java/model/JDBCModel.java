@@ -67,8 +67,7 @@ public class JDBCModel implements Model {
                 int isAdded = statement.executeUpdate(sql);
 
                 if (isAdded > 0) {
-                    connection.commit();
-                    connection.setAutoCommit(true);
+                    commit(sp);
                     view.printMessage("New player '%s' was added.", newPlayer.getTempNickName());
                 } else {
                     view.printMessage("New player '%s' wasn`t added.", SGID);
@@ -100,8 +99,7 @@ public class JDBCModel implements Model {
             int isDeleted = statement.executeUpdate();
 
             if (isDeleted > 0) {
-                connection.commit();
-                connection.setAutoCommit(true);
+                commit(sp);
                 view.printMessage("Player '%s' was deleted from data base.", SGID);
             } else {
                 view.printMessage("Player wasn`t deleted from data base or not found.");
@@ -167,8 +165,7 @@ public class JDBCModel implements Model {
             int isUpdated = statement.executeUpdate(updateSQL);
 
             if (isUpdated > 0) {
-                connection.commit();
-                connection.setAutoCommit(true);
+                commit(sp);
                 view.printMessage("Player '%s' was updated because he is exists in database.", player.getTempNickName());
             } else {
                 view.printMessage("New player '%s' wasn`t updated.", SGID);
@@ -231,8 +228,7 @@ public class JDBCModel implements Model {
             int isAdded = statement.executeUpdate(sql);
 
             if (isAdded > 0) {
-                connection.commit();
-                connection.setAutoCommit(true);
+                commit(sp);
                 view.printMessage("New admin '%s' was added.", name);
             } else {
                 view.printMessage("New player '%s' wasn`t added.", name);
@@ -262,8 +258,7 @@ public class JDBCModel implements Model {
             int isAdmin = statement.executeUpdate(sql);
 
             if (isAdmin > 0) {
-                connection.commit();
-                connection.setAutoCommit(true);
+                commit(sp);
                 view.printMessage("Player '%s' is admin now.", nickNameOrBMIDOrSGID);
             } else {
                 view.printMessage("Player '%s' not found.", nickNameOrBMIDOrSGID);
@@ -292,8 +287,7 @@ public class JDBCModel implements Model {
             int isAdmin = statement.executeUpdate(sql);
 
             if (isAdmin > 0) {
-                connection.commit();
-                connection.setAutoCommit(true);
+                commit(sp);
                 view.printMessage("Player '%s' is not admin now.", nickNameOrBMIDOrSGID);
             } else {
                 view.printMessage("Player '%s' not found.", nickNameOrBMIDOrSGID);
@@ -321,8 +315,7 @@ public class JDBCModel implements Model {
                 int isChanged = statement.executeUpdate(sql);
 
                 if (isChanged > 0) {
-                    connection.commit();
-                    connection.setAutoCommit(true);
+                    commit(sp);
                     view.printMessage("Player '%s' BMID has been changed to '%s'", nickName, bmid);
                 } else {
                     view.printMessage("Player '%s' not found.", nickName);
@@ -350,8 +343,7 @@ public class JDBCModel implements Model {
             int isDeleted = statement.executeUpdate(sql);
 
             if (isDeleted > 0) {
-                connection.commit();
-                connection.setAutoCommit(true);
+                commit(sp);
                 view.printMessage("Players from family '%s' was deleted from data base.", familyName);
             } else {
                 view.printMessage("Family wasn`t deleted from data base or not found.");
@@ -539,8 +531,7 @@ public class JDBCModel implements Model {
             int isDeleted = statement.executeUpdate(sql);
 
             if (isDeleted > 0) {
-                connection.commit();
-                connection.setAutoCommit(true);
+                commit(sp);
                 view.printMessage("Database was cleared.");
             } else {
                 view.printMessage("Database wasn`t cleared.");
@@ -555,6 +546,17 @@ public class JDBCModel implements Model {
     private void rollback(Savepoint sp) { //todo implement the same method commit
         try {
             connection.rollback(sp);
+            connection.releaseSavepoint(sp);
+            connection.setAutoCommit(true);
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+            //logger.error(Arrays.toString(ex.getStackTrace()));
+        }
+    }
+
+    private void commit(Savepoint sp) {
+        try {
+            connection.commit();
             connection.releaseSavepoint(sp);
             connection.setAutoCommit(true);
         } catch (SQLException ex) {
