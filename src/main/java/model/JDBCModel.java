@@ -88,15 +88,12 @@ public class JDBCModel implements Model {
     @Override
     public void deletePlayer(String SGID) {
         Savepoint sp = null;
-        String sql = "DELETE FROM player WHERE sgid = ? LIMIT 1";
+        String sql = String.format("DELETE FROM player WHERE sgid = '%1$s' LIMIT 1", SGID);
 
-        try (PreparedStatement statement = connection.prepareStatement(sql)) {
-            statement.setString(1, SGID);
-            statement.setString(2, SGID);
-
+        try (Statement statement = connection.createStatement()) {
             connection.setAutoCommit(false);
             sp = connection.setSavepoint("Before_deleting_player");
-            int isDeleted = statement.executeUpdate();
+            int isDeleted = statement.executeUpdate(sql);
 
             if (isDeleted > 0) {
                 commit(sp);

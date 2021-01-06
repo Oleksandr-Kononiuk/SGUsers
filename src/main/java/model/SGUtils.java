@@ -1,5 +1,6 @@
 package model;
 
+import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
@@ -115,10 +116,13 @@ public class SGUtils {
         Document doc = null;
         try {
             doc = Jsoup.connect(source)
-                    .userAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.198 Safari/537.36 OPR/72.0.3815.400")
+                    .userAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.88 Safari/537.36 OPR/73.0.3856.284")
                     .referrer("no-referrer-when-downgrade")
+                    .timeout(300000) //5 min
+                    .method(Connection.Method.GET)
                     .get();
         } catch (IOException e) {
+            e.printStackTrace();
             logger.error(Arrays.toString(e.getStackTrace()));
         }
         return doc;
