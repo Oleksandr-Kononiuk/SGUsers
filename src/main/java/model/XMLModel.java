@@ -339,7 +339,7 @@ public class XMLModel implements Model {
     public void clearAll() {
         players.clear();
         view.printMessage("Database was cleared.");
-        //writeToDB(); //todo when all will works fine, delete comment
+        writeToDB();
     }
 
     @Override
@@ -394,13 +394,13 @@ public class XMLModel implements Model {
 
                 XMLModel listWrapper = (XMLModel) unmarshaller.unmarshal(xmlStream);
                 players = new ArrayList<>(listWrapper.getPlayers());
+                view.printMessage("Database has been read.");
             } catch (JAXBException|NullPointerException e) {
                 logger.error(Arrays.toString(e.getStackTrace()));
             }
         } catch (IOException e) {
             logger.error(Arrays.toString(e.getStackTrace()));
         }
-        view.printMessage("Database has been read.");
     }
 
     @Override

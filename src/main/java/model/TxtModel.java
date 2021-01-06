@@ -333,7 +333,7 @@ public class TxtModel implements Externalizable, Model {
     public void clearAll() {
         players.clear();
         view.printMessage("Database was cleared.");
-        //writeToDB(); //todo when all will works fine, delete comment
+        writeToDB(); //todo when all will works fine, delete comment
     }
 
     @Override

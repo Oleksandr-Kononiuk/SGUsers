@@ -540,7 +540,7 @@ public class JDBCModel implements Model {
         }
     }
 
-    private void rollback(Savepoint sp) { //todo implement the same method commit
+    private void rollback(Savepoint sp) {
         try {
             connection.rollback(sp);
             connection.releaseSavepoint(sp);

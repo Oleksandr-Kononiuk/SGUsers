@@ -13,7 +13,7 @@ import java.util.Arrays;
 import java.util.Random;
 
 public class Controller {
-    private Model model = new JDBCModel();
+    private Model model = new TxtModel();
     private ConsoleHelper view = new ConsoleHelper();
 
     private static final Logger logger = LoggerFactory.getLogger(Controller.class);
