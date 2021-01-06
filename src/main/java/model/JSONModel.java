@@ -405,6 +405,13 @@ public class JSONModel implements Model {
         }
     }
 
+    @Override
+    public void exit() {
+        view.printMessage("Saving data base...");
+        writeToDB();
+        System.exit(0);
+    }
+
     /**
      * Geters and Seters
      */

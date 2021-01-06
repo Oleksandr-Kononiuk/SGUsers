@@ -398,6 +398,13 @@ public class TxtModel implements Externalizable, Model {
     }
 
     @Override
+    public void exit() {
+        view.printMessage("Saving data base...");
+        writeToDB();
+        System.exit(0);
+    }
+
+    @Override
     public void writeExternal(ObjectOutput out) throws IOException {
         out.writeObject(players);
     }

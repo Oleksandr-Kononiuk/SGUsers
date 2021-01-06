@@ -70,7 +70,7 @@ public class Controller {
                     case "!get" : model.readFromDB(); break;//++
                     case "!backup" : model.backup(); break;//++
                     case "!clear-all" : model.clearAll(); break;//++
-                    case "!exit" : exit(); break;//+
+                    case "!exit" : model.exit(); break;//+
 
                     //others commands
                     case "!fill-players" : model.fillPlayers(cmdArgN1); break;//+
@@ -117,11 +117,5 @@ public class Controller {
                 "\n" +
                 "!fill-players       - reads player data from X pages. The process is long and may fail.\n" +
                 "!help               - displays a list of commands with a description.\n");
-    }
-
-    private void exit() {
-        view.printMessage("Saving data base...");
-        model.writeToDB();
-        System.exit(0);
     }
 }

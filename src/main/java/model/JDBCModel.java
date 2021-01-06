@@ -620,6 +620,18 @@ public class JDBCModel implements Model {
     }
 
     @Override
+    public void exit() {
+        try {
+            connection.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            //logger.warn(Arrays.toString(e.getStackTrace()));
+        } finally {
+            System.exit(0);
+        }
+    }
+
+    @Override
     public void setPlayers(List<Player> players) {
         view.printMessage("Not supported for SQL database");
     }

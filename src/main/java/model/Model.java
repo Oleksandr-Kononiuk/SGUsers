@@ -55,5 +55,7 @@ public interface Model {
 
     void fillPlayers(String cmdArgumentN1);
 
+    void exit();
+
     void setPlayers(List<Player> players);
 }
