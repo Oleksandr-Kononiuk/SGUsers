@@ -2,7 +2,7 @@ package model;
 
 import java.util.List;
 
-//DAO
+//DAO Layer
 public interface Model {
 
     void addNewPlayer(String SGProfileLink);

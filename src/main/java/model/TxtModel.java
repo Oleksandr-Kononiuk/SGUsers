@@ -333,7 +333,7 @@ public class TxtModel implements Externalizable, Model {
     public void clearAll() {
         players.clear();
         view.printMessage("Database was cleared.");
-        writeToDB(); //todo when all will works fine, delete comment
+        writeToDB();
     }
 
     @Override
@@ -376,7 +376,7 @@ public class TxtModel implements Externalizable, Model {
                      new ObjectInputStream(new FileInputStream(CURRENT_DB_PATH))) {
 
             players = (List<Player>) objectInputStream.readObject();
-//todo add copy
+
             view.printMessage("Database was read success.");
         } catch (IOException | ClassNotFoundException e) {
             view.printMessage("Data base was not found. " +
