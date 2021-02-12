@@ -58,6 +58,25 @@ public class BMUtils {
         return false;
     }
 
+    public String getName(String BMID) {
+        Document BM = getServerInfo();
+
+        Elements activePlayers = BM.getElementsByAttributeValue("class", "col-md-8");
+        Elements elements = activePlayers.first().getElementsByAttribute("href");
+
+        if (elements.size() != 0) {
+            for (Element e : elements) {
+                String id = e.attr("href").toString();
+                id = id.substring(id.lastIndexOf('/') + 1);
+
+                if (id.equals(BMID)) {
+                    return e.text();
+                }
+            }
+        }
+        return null;
+    }
+
     public String getBMID(String player) {
         Document BM = getServerInfo();
 

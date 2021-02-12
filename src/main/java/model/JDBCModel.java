@@ -84,7 +84,7 @@ public class JDBCModel implements Model {
     }
 
     @Override
-    public void deletePlayer(String SGID) { //todo player name have 2+ words //todo refactor using PreparedStatement
+    public void deletePlayer(String SGID) { //todo player name have 2+ words
         Savepoint sp = null;
         String sql = "DELETE FROM player WHERE sgid = ? LIMIT 1";
 
@@ -149,7 +149,13 @@ public class JDBCModel implements Model {
     }
 
     @Override
-    public void updatePlayer(String SGID) { //todo update admin temp nickname. This can be do only using battlemetrics by BM id
+    //todo
+    /*
+    1) взяти гравця з бази, якщо такий є. Потрібно BMID.
+    2) взяти гравця з спартангеймінг щоб обновити нікнейм
+    3) обновити BMID по цьому нікнейму. Якщо гравець адмін то в нас є BMID і ми можем по батлметріку оновити його нік
+     */
+    public void updatePlayer(String SGID) {
         Player player = SG.getNewPlayer(SGID);
         Savepoint sp = null;
         String updateSQL = "UPDATE player " +
@@ -377,7 +383,8 @@ public class JDBCModel implements Model {
     }
 
     @Override
-    public void printFamily(String familyName) {
+    public void printFamily(String familyName1, String familyName2) {
+        String familyName = familyName1 + " " + familyName2;
         view.printFamilyWithOnline(getFamilyMembers(familyName));
     }
 
@@ -394,8 +401,11 @@ public class JDBCModel implements Model {
     @Override
     public void topFamilies() {
         List<List<Player>> sortedList = new ArrayList<>();
+
         for (Map.Entry<String, List<Player>> entry : getAllFamilies().entrySet()) {
-            sortedList.add(entry.getValue());
+            if (!entry.getKey().equals("[Null]")) {
+                sortedList.add(entry.getValue());
+            }
         }
         sortedList.sort(new Comparator<List<Player>>() {
             @Override
@@ -497,6 +507,7 @@ public class JDBCModel implements Model {
                 familiesMemberList.put(s, getFamilyMembers(s));
             }
         } catch (SQLException e) {
+            e.printStackTrace();
             logger.error(Arrays.toString(e.getStackTrace()));
         }
         return familiesMemberList;
@@ -510,7 +521,7 @@ public class JDBCModel implements Model {
 
         try (PreparedStatement statement = connection.prepareStatement(getMembers)) {
             statement.setString(1, familyName);
-            ResultSet rs = statement.executeQuery(getMembers);
+            ResultSet rs = statement.executeQuery();
 
             while (rs.next()) {
                 Player player = new Player();
@@ -526,6 +537,7 @@ public class JDBCModel implements Model {
                 members.add(player);
             }
         } catch (SQLException e) {
+            e.printStackTrace();
             logger.error(Arrays.toString(e.getStackTrace()));
         }
         return members;

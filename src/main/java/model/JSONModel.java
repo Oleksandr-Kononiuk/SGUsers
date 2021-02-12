@@ -219,7 +219,8 @@ public class JSONModel implements Model {
 
     //print family with online status of members
     @Override
-    public void printFamily(String familyName) {
+    public void printFamily(String familyName1, String familyName2) {
+        String familyName = familyName1 + " " + familyName2;
         List<Player> f = getFamilyMembers(familyName);
         if (f.size() > 0) {
             for (Player m : f) {

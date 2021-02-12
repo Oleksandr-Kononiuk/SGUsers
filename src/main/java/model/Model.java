@@ -31,7 +31,7 @@ public interface Model {
 
     void updateFamily(String oldFamilyName);
 
-    void printFamily(String familyName);
+    void printFamily(String familyName1, String familyName2);
 
     void printAllFamilies();
 
