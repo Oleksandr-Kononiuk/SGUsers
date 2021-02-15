@@ -5,15 +5,13 @@ import org.apache.log4j.BasicConfigurator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import view.ConsoleHelper;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Arrays;
-import java.util.Random;
 
 public class Controller {
-    private Model model = new TxtModel();
+    private Model model = new JDBCModel();
     private ConsoleHelper view = new ConsoleHelper();
 
     private static final Logger logger = LoggerFactory.getLogger(Controller.class);
@@ -57,9 +55,9 @@ public class Controller {
                     case "!search-player" : model.searchPlayer(cmdArgN1); break; //++
 
                     //family commands
-                    case "!delete-family" : model.deleteFamily(cmdArgN1); break;//++
+                    case "!delete-family" : model.deleteFamily(cmdArgN1, cmdArgN2); break;//++
                     case "!print-families" : model.printAllFamilies(); break;//+
-                    case "!search-family" : model.printFamily(cmdArgN1); break;//++
+                    case "!search-family" : model.printFamily(cmdArgN1, cmdArgN2); break;//++
                     case "!update-family" : model.updateFamily(cmdArgN1); break; //+
                     case "!top" : model.topFamilies(); break;//+
                     case "!admins" : model.searchAllAdmins(); break;//++
@@ -102,7 +100,7 @@ public class Controller {
                 "!delete-family      - remove family from the base. Searches by the first letters in the name. " +
                 "                      The first found one will be deleted.\n" +
                 "!print-families     - to bring to the screen all the families in the database..\n" +
-                "!search-family      - looking for the first letters of the family. Displays the first one found.\n" +
+                "!search-family      - Displays all families which starts the first letters.\n" +
                 "!update-family      - update family members info, like !update-player. \n" +
 
                 "!top                - print top 10 families by their members count. \n" +

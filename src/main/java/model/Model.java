@@ -27,7 +27,7 @@ public interface Model {
      * Family methods
      */
 
-    void deleteFamily(String familyName);
+    void deleteFamily(String familyName1, String familyName2);
 
     void updateFamily(String oldFamilyName);
 

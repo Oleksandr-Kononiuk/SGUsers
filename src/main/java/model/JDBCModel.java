@@ -350,16 +350,17 @@ public class JDBCModel implements Model {
     }
     //todo family name have 2+ words
     @Override
-    public void deleteFamily(String familyName) {
+    public void deleteFamily(String familyName1, String familyName2) {
+        String familyName = familyName1 + " " + familyName2;
         Savepoint sp = null;
         String sql = "DELETE FROM player " +
-                    "WHERE family = ?;";
+                    "WHERE family REGEXP ?;";
 
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
             connection.setAutoCommit(false);
             sp = connection.setSavepoint("Before_deleting_family");
 
-            statement.setString(1, familyName);
+            statement.setString(1, ("^" + familyName.trim()));
 
             int isDeleted = statement.executeUpdate();
 
@@ -385,7 +386,7 @@ public class JDBCModel implements Model {
     @Override
     public void printFamily(String familyName1, String familyName2) {
         String familyName = familyName1 + " " + familyName2;
-        view.printFamilyWithOnline(getFamilyMembers(familyName));
+        view.printFamilyWithOnline(getFamilyMembers(familyName.trim()));
     }
 
     @Override
@@ -517,10 +518,10 @@ public class JDBCModel implements Model {
         List<Player> members = new ArrayList<>();
         String getMembers = "SELECT sgid, tempNickName, mainNickName, family, isAdmin, bmid, profileLink " +
                             "FROM player " +
-                            "WHERE family = ?;";
+                            "WHERE family REGEXP ?;";
 
         try (PreparedStatement statement = connection.prepareStatement(getMembers)) {
-            statement.setString(1, familyName);
+            statement.setString(1, ("^" + familyName.trim()));
             ResultSet rs = statement.executeQuery();
 
             while (rs.next()) {
@@ -537,7 +538,6 @@ public class JDBCModel implements Model {
                 members.add(player);
             }
         } catch (SQLException e) {
-            e.printStackTrace();
             logger.error(Arrays.toString(e.getStackTrace()));
         }
         return members;

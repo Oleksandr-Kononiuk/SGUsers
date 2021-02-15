@@ -191,8 +191,9 @@ public class JSONModel implements Model {
      */
 
     @Override
-    public void deleteFamily(String familyName) {
-        List<Player> f = getFamilyMembers(familyName);
+    public void deleteFamily(String familyName1, String familyName2) {
+        String familyName = familyName1 + " " + familyName2;
+        List<Player> f = getFamilyMembers(familyName.trim());
         if (f.size() > 0) {
             players.removeAll(f);
             view.printMessage("Family '%s' was deleted.", familyName);
@@ -221,7 +222,7 @@ public class JSONModel implements Model {
     @Override
     public void printFamily(String familyName1, String familyName2) {
         String familyName = familyName1 + " " + familyName2;
-        List<Player> f = getFamilyMembers(familyName);
+        List<Player> f = getFamilyMembers(familyName.trim());
         if (f.size() > 0) {
             for (Player m : f) {
                 SG.updatePlayer(m);
